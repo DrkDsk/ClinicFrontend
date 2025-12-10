@@ -3,6 +3,6 @@ import {Profile} from '../../../users/profile/domain/entities/profile';
 
 export interface User {
   id: string
-  person: Profile,
+  profile: Profile,
   roles: [Role]
 }
