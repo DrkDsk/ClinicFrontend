@@ -28,7 +28,7 @@ export class ProfileCardComponent implements OnInit {
         return;
       }
 
-      this.profile = response?.person;
+      this.profile = response?.profile;
     })
   }
 

@@ -134,10 +134,10 @@ export class CreateAppointmentComponent implements OnInit {
 
   loadPatientProfile() {
     this.profileRepository.getProfile().subscribe((response) => {
-      const profile = response?.person;
+      const profile = response?.profile;
 
       if (profile) {
-        this.patientProfile = response?.person;
+        this.patientProfile = response?.profile;
         this.patientForm.get('name')?.patchValue(profile.name);
         this.patientForm.get('lastName')?.patchValue(profile.last_name);
       } else {
