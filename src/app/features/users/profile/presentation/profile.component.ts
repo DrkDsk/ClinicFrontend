@@ -5,9 +5,9 @@ import {ProfileRepository} from '../domain/repositories/profile.repository';
 import {ProfileRepositoryImpl} from '../data/repositories/profile.repository.impl';
 import {TableComponent} from '../../../../core/shared/presentation/table/table.component';
 import {PaginatorMeta} from '../../../../core/shared/domain/entities/meta';
-import {PaginatorHelper} from '../../../../core/helpers/PaginatorHelper';
 import {FormsModule} from '@angular/forms';
 import {Button} from 'primeng/button';
+import {PaginatorService} from '../../../../core/shared/data/services/paginator/paginator.service';
 
 @Component({
   selector: 'app-profile.component',
@@ -22,22 +22,15 @@ import {Button} from 'primeng/button';
 export class ProfileComponent implements OnInit {
 
   private profileRepository: ProfileRepository = inject(ProfileRepositoryImpl)
+  private paginatorService = inject(PaginatorService)
+  private searchSubject = new Subject<string>();
 
   people: Profile[] = [];
   originalPeople: Profile[] = [];
-  paginatorMeta: PaginatorMeta = {
-    from: 0,
-    to: 0,
-    current_page: 1,
-    last_page: 0,
-    total: 0,
-    per_page: 0,
-    pages: []
-  }
+  paginatorMeta!: PaginatorMeta
 
   enablePagination = true;
   peopleQuery = ""
-  private searchSubject = new Subject<string>();
 
   columns = [
     {header: 'Nombre', field: 'name'},
@@ -116,24 +109,13 @@ export class ProfileComponent implements OnInit {
   }
 
   getProfilePaginateService(page?: number, perPage?: number) {
-    this.profileRepository.getProfilesPaginate(page, perPage)
-      .subscribe((response) => {
-      this.people = response.data;
-
-      const responseMeta = response?.meta;
-      const current = responseMeta?.current_page ?? 1;
-      const last = responseMeta?.last_page ?? 0
-
-      this.paginatorMeta = {
-        ...this.paginatorMeta,
-        from: responseMeta?.from ?? 0,
-        to: responseMeta?.to ?? 0,
-        current_page: current,
-        last_page: responseMeta?.last_page ?? 0,
-        total: responseMeta?.total ?? 0,
-        per_page: responseMeta?.per_page ?? 0,
-        pages: PaginatorHelper.getVisiblePages(current, last)
-      }
-    });
+    this.paginatorService.paginate<Profile>(
+      (page, perPage) => this.profileRepository.getProfilesPaginate(page, perPage),
+      page,
+      perPage
+    ).subscribe(response => {
+      this.people = response.items
+      this.paginatorMeta = response.meta
+    })
   }
 }
