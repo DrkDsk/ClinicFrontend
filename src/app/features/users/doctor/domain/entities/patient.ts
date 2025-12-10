@@ -6,5 +6,5 @@ export interface Patient {
   height?: string
   weight_measure_type?: string
   height_measure_type?: string
-  person: Profile
+  profile: Profile
 }

@@ -4,6 +4,6 @@ import {Meta} from '../../../../../core/shared/domain/entities/meta';
 
 export interface PeopleDataResponseModel {
   data: Profile[]
-  links: Links | null | undefined
-  meta: Meta | null | undefined
+  links: Links
+  meta: Meta
 }

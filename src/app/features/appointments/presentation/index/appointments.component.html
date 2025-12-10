@@ -2,4 +2,38 @@
   <div class="flex justify-end my-3">
     <app-large-button [title]="'Registrar'" (onClick)="navigateToCreateAppointment()"></app-large-button>
   </div>
+
+  <div class="w-full">
+    <div class="flex my-auto mx-auto shadow-sm shadow-surface-100 rounded-sm bg-surface-100">
+      <div class="w-11/12 mx-auto my-2">
+        <div class="grid grid-cols-3 gap-8">
+
+          @for (appointment of appointments; track appointment.id) {
+            <div
+              class="group p-5 hover:bg-surface-200 hover:rounded-3xl">
+              <div
+                class="flex flex-col justify-between h-64 p-4 rounded-3xl
+                      items-start transition-all duration-400 ease-out group-hover:scale-[1.04]
+                      group-hover:-translate-y-[2px] group-hover:shadow-xl shadow-lg bg-surface-0">
+                <div class="flex flex-col">
+                  <p class="text-2xl ">Doctor :
+                    <span class="text-xl">{{ appointment.doctor.profile.name }}</span>
+                  </p>
+                  <p class="text-2xl ">Paciente :
+                    <span class="text-xl"> {{ appointment.patient.profile?.name }}</span>
+                  </p>
+                </div>
+
+                <p class="text-end text-lg">{{ appointment.scheduled_at }}</p>
+                <div class="flex flex-row justify-between space-x-4 w-full">
+                  <p class="text-end text-lg uppercase">{{ appointment.typeAppointment.name }}</p>
+                  <p class="text-end text-lg uppercase">{{ appointment.time }}</p>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
