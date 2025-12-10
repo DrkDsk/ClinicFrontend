@@ -10,7 +10,7 @@ import {debounceTime, distinctUntilChanged, Subject} from 'rxjs';
 import {FormsModule} from '@angular/forms';
 import {TableComponent} from '../../../../../core/shared/presentation/table/table.component';
 import {PaginatorMeta} from '../../../../../core/shared/domain/entities/meta';
-import {PaginatorHelper} from '../../../../../core/helpers/PaginatorHelper';
+import {PaginatorService} from '../../../../../core/shared/data/services/paginator/paginator.service';
 
 @Component({
   selector: 'app-doctors.component',
@@ -27,20 +27,13 @@ export class DoctorsComponent implements OnInit {
 
   private doctorRepository: DoctorRepository = inject(DoctorRepositoryImpl)
   private navigationFacade: NavigationFacade = inject(NavigationFacade)
+  private paginatorService = inject(PaginatorService)
+  private searchSubject = new Subject<string>();
 
   doctors: Doctor[] = [];
   originalDoctors: Doctor[] = [];
   doctorQuery = ""
-  private searchSubject = new Subject<string>();
-  paginatorMeta: PaginatorMeta = {
-    from: 0,
-    to: 0,
-    current_page: 1,
-    last_page: 0,
-    total: 0,
-    per_page: 0,
-    pages: []
-  }
+  paginatorMeta!: PaginatorMeta
 
   ngOnInit(): void {
     this.searchSubject
@@ -107,23 +100,14 @@ export class DoctorsComponent implements OnInit {
   }
 
   getDoctorPaginateService(page?: number, perPage?: number) {
-    this.doctorRepository.getDoctors(page, perPage).subscribe((response) => {
-      this.doctors = response.data;
-      const responseMeta = response?.meta;
-      const current = responseMeta?.current_page ?? 1;
-      const last = responseMeta?.last_page ?? 0
-
-      this.paginatorMeta = {
-        ...this.paginatorMeta,
-        from: responseMeta?.from ?? 0,
-        to: responseMeta?.to ?? 0,
-        current_page: current,
-        last_page: responseMeta?.last_page ?? 0,
-        total: responseMeta?.total ?? 0,
-        per_page: responseMeta?.per_page ?? 0,
-        pages: PaginatorHelper.getVisiblePages(current, last)
-      }
-    });
+    this.paginatorService.paginate<Doctor>(
+      (page, perPage) => this.doctorRepository.getDoctors(page, perPage),
+      page,
+      perPage
+    ).subscribe(response => {
+      this.doctors = response.items
+      this.paginatorMeta = response.meta
+    })
   }
 
   columns = [
